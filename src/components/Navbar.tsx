@@ -8,6 +8,7 @@ const navLinks = [
   { name: "Experience", href: "#experience" },
   { name: "Projects", href: "#projects" },
   { name: "Services", href: "#services" },
+  { name: "Resume", href: "https://docs.google.com/document/d/1uDUjIq4mxVX2SChuHV9Ls01atF7hmjWgOQJTd1O4FCk/edit?usp=sharing", external: true },
 ];
 
 export default function Navbar() {
@@ -30,6 +31,8 @@ export default function Navbar() {
             <motion.a
               key={link.name}
               href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noopener noreferrer" : undefined}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
@@ -65,6 +68,8 @@ export default function Navbar() {
             <a
               key={link.name}
               href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noopener noreferrer" : undefined}
               onClick={() => setIsOpen(false)}
               className="text-lg font-medium text-gray-300"
             >

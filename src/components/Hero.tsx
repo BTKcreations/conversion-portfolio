@@ -55,10 +55,18 @@ export default function Hero() {
             Hire Me Now
           </a>
           <a
-            href="#projects"
-            className="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+            href="https://docs.google.com/document/d/1uDUjIq4mxVX2SChuHV9Ls01atF7hmjWgOQJTd1O4FCk/edit?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white/10 transition-all hover:border-emerald-500/30"
           >
-            View Projects
+            View Resume
+          </a>
+          <a
+            href="#projects"
+            className="w-full sm:w-auto text-gray-400 px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:text-white transition-all"
+          >
+            Explore Projects
           </a>
         </motion.div>
       </div>
