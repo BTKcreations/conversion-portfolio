@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import profileImg from "../profile.png";
 
 export default function About() {
   return (
@@ -39,7 +40,7 @@ export default function About() {
           >
             <div className="aspect-square rounded-3xl overflow-hidden glass relative z-10 p-2">
                <img 
-                src="/src/profile.png" 
+                src={profileImg} 
                 alt="Tharun Kumar Budde" 
                 className="w-full h-full object-cover rounded-2xl"
                 referrerPolicy="no-referrer"
