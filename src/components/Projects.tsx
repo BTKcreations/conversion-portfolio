@@ -1,10 +1,15 @@
 import { motion } from "motion/react";
 import { ExternalLink, Github } from "lucide-react";
+import securevaultImg from "../assets/securevault.png";
+import shopsmartImg from "../assets/shopsmart.png";
+import factVsFictionImg from "../assets/fact_vs_fiction.png";
+import snookerImg from "../assets/snooker.png";
+import dashboardImg from "../assets/dashboard.png";
 
 const projects = [
   {
     title: "SecureVault | Encrypted Cloud Storage",
-    image: "https://picsum.photos/seed/cyber-security-vault/800/600",
+    image: securevaultImg,
     tags: ["React", "AES-256", "Node.js"],
     desc: "Cloud-based encrypted file sharing with military-grade security standards.",
     problem: "Traditional cloud storage lacks client-side encryption and granular owner control.",
@@ -13,7 +18,7 @@ const projects = [
   },
   {
     title: "ShopSmart AI | Intelligent E-commerce",
-    image: "https://picsum.photos/seed/ai-shopping-smart/800/600",
+    image: shopsmartImg,
     tags: ["Next.js", "OpenAI", "PostgreSQL"],
     desc: "Autonomous product discovery platform with AI-driven recommendations.",
     problem: "Users get overwhelmed by static categories and irrelevant suggestions.",
@@ -22,7 +27,7 @@ const projects = [
   },
   {
     title: "Fact vs Fiction | AI Detection System",
-    image: "https://picsum.photos/seed/fake-news-detector/800/600",
+    image: factVsFictionImg,
     tags: ["Python", "RAG", "ChromaDB"],
     desc: "Published Research: Distributed AI pipeline for misinformation detection.",
     problem: "Rapid spread of fake news across social platforms without verified grounding.",
@@ -31,7 +36,7 @@ const projects = [
   },
   {
     title: "Snooker Management System",
-    image: "https://picsum.photos/seed/snooker-billiards-club/800/600",
+    image: snookerImg,
     tags: ["Next.js", "Firebase", "Real-time"],
     desc: "Web-based billing and management solution for commercial centers.",
     problem: "Manual billing leading to human error and revenue tracking difficulties.",
@@ -40,7 +45,7 @@ const projects = [
   },
   {
     title: "Multi App Dashboard | PWA",
-    image: "https://picsum.photos/seed/productivity-dashboard-pwa/800/600",
+    image: dashboardImg,
     tags: ["PWA", "Service Workers", "OAuth"],
     desc: "Offline-capable modular dashboard with productivity tool integration.",
     problem: "Productivity loss due to tool fragmentation and poor offline access.",
