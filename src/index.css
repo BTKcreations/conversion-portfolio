@@ -27,3 +27,23 @@
 .glass {
   @apply bg-white/5 backdrop-blur-xl border border-white/10;
 }
+
+.prose-chat p {
+  @apply mb-2 last:mb-0;
+}
+
+.prose-chat ul, .prose-chat ol {
+  @apply mb-2 ml-4 list-disc last:mb-0;
+}
+
+.prose-chat code {
+  @apply bg-black/30 px-1 rounded font-mono text-emerald-400;
+}
+
+.prose-chat pre {
+  @apply bg-black/40 p-2 rounded-lg my-2 overflow-x-auto;
+}
+
+.prose-chat pre code {
+  @apply bg-transparent p-0 text-gray-300 block text-xs;
+}
