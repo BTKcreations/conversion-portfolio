@@ -16,7 +16,9 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
-    'https://BTKcreations.github.io'
+    'https://BTKcreations.github.io',
+    'https://bstk.in',
+    'https://www.bstk.in'
   ],
   methods: ['GET', 'POST']
 }));
