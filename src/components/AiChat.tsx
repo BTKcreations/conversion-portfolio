@@ -35,7 +35,11 @@ const AiChat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const apiUrl = import.meta.env.DEV 
+        ? 'http://localhost:5000/api/chat' 
+        : 'https://conversion-portfolio.onrender.com/api/chat';
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

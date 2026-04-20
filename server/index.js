@@ -11,12 +11,15 @@ dotenv.config({ override: true });
 const app = express();
 const port = process.env.PORT || 5000;
 
-console.log("Config Check (FORCED):");
-console.log("- Host:", process.env.OLLAMA_HOST);
-console.log("- Model:", process.env.OLLAMA_MODEL);
-
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://BTKcreations.github.io'
+  ],
+  methods: ['GET', 'POST']
+}));
 app.use(express.json());
 
 const limiter = rateLimit({
