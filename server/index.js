@@ -12,6 +12,7 @@ import archiver from 'archiver';
 import AdmZip from 'adm-zip';
 import fs from 'fs/promises';
 import path from 'path';
+import puppeteer from 'puppeteer';
 
 // Force override because something (dotenvx?) is clashing
 dotenv.config({ override: true });
@@ -112,7 +113,7 @@ const saveSessionToDb = async () => {
           console.log(`📊 Backup size: ${sizeMB} MB`);
 
           if (buffer.length > 15 * 1024 * 1024) {
-             throw new Error("Session too large for MongoDB (16MB limit). Use GridFS or clean manually.");
+            throw new Error("Session too large for MongoDB (16MB limit). Use GridFS or clean manually.");
           }
 
           await Session.findOneAndUpdate(
@@ -159,7 +160,7 @@ const restoreSessionFromDb = async () => {
   try {
     console.log("🔍 Checking Cloud for existing session...");
     const session = await Session.findOne({ clientId: CLIENT_ID });
-    
+
     if (session) {
       console.log("📥 Session found! Restoring to local storage...");
       await fs.mkdir(SESSION_DIR, { recursive: true });
@@ -205,6 +206,7 @@ const initializeWhatsApp = async () => {
       }),
       puppeteer: {
         headless: true,
+        executablePath: puppeteer.executablePath(),
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -217,21 +219,21 @@ const initializeWhatsApp = async () => {
     client.on('qr', (qr) => {
       console.log('--- SCAN THE QR CODE BELOW TO LOG IN ---');
       qrcode.generate(qr, { small: true });
-      isFirstLogin = true; 
+      isFirstLogin = true;
     });
 
     client.on('ready', async () => {
       console.log('✅ WhatsApp AI Bot is Ready!');
-      
+
       if (isFirstLogin && !isBackingUp) {
         console.log("🔄 New Login detected. Finalizing cloud backup in 5s...");
         isBackingUp = true;
         isFirstLogin = false;
-        
+
         setTimeout(async () => {
           console.log("💤 Temporarily closing bot to release file locks...");
           await client.destroy();
-          
+
           setTimeout(async () => {
             await saveSessionToDb();
             console.log("🚀 Backup complete! Restarting bot for permanent operation...");
@@ -247,7 +249,7 @@ const initializeWhatsApp = async () => {
     client.on('message', async (msg) => {
       if (msg.body.includes('*New Inquiry from Portfolio*')) {
         console.log("🔍 Detected Portfolio Inquiry. Generating AI response...");
-        
+
         try {
           const response = await ollama.chat({
             model: process.env.OLLAMA_MODEL || "gpt-oss:120b",
