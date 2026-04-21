@@ -4,6 +4,14 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { Ollama } from 'ollama';
 import dotenv from 'dotenv';
+import pkg from 'whatsapp-web.js';
+const { Client, LocalAuth } = pkg;
+import mongoose from 'mongoose';
+import qrcode from 'qrcode-terminal';
+import archiver from 'archiver';
+import AdmZip from 'adm-zip';
+import fs from 'fs/promises';
+import path from 'path';
 
 // Force override because something (dotenvx?) is clashing
 dotenv.config({ override: true });
@@ -71,6 +79,195 @@ Highlights:
 
 const THARUN_IDENTITY = `${THARUN_PERSONALITY}\n${THARUN_KNOWLEDGE}`;
 
+// --- MANUAL PERSISTENCE LOGIC ---
+
+const sessionSchema = new mongoose.Schema({
+  clientId: { type: String, required: true, unique: true },
+  zipData: { type: Buffer, required: true },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const Session = mongoose.model('Session', sessionSchema);
+
+const SESSION_DIR = './.wwebjs_auth';
+const CLIENT_ID = 'tharun-ai-bot';
+
+let isFirstLogin = false;
+
+const saveSessionToDb = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log("📦 Zipping session for Cloud Backup (Aggressive Cleanup)...");
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      const chunks = [];
+
+      archive.on('data', (chunk) => chunks.push(chunk));
+      archive.on('end', async () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const sizeMB = (buffer.length / (1024 * 1024)).toFixed(2);
+          console.log(`📊 Zip size: ${sizeMB} MB`);
+
+          if (buffer.length > 15 * 1024 * 1024) {
+             throw new Error("Session zip is still too large (>15MB). Contact support or clean manual.");
+          }
+
+          await Session.findOneAndUpdate(
+            { clientId: CLIENT_ID },
+            { zipData: buffer, updatedAt: new Date() },
+            { upsert: true }
+          );
+          console.log("✅ Session successfully backed up to MongoDB Atlas!");
+          resolve();
+        } catch (err) {
+          console.error("❌ Database update failed:", err.message);
+          reject(err);
+        }
+      });
+
+      archive.on('error', (err) => {
+        console.error("❌ Archiver error:", err.message);
+        reject(err);
+      });
+
+      // Aggressively exclude large junk folders
+      archive.glob('**/*', {
+        cwd: SESSION_DIR,
+        ignore: [
+          '**/Cache/**',
+          '**/Code Cache/**',
+          '**/Service Worker/**',
+          '**/GPUCache/**',
+          '**/logs/**',
+          '**/*.log',
+          '**/*.tmp'
+        ]
+      });
+
+      archive.finalize();
+    } catch (err) {
+      console.error("❌ Failed to initiate zipping:", err.message);
+      reject(err);
+    }
+  });
+};
+
+const restoreSessionFromDb = async () => {
+  try {
+    console.log("🔍 Checking Cloud for existing session...");
+    const session = await Session.findOne({ clientId: CLIENT_ID });
+    
+    if (session) {
+      console.log("📥 Session found! Restoring to local storage...");
+      await fs.mkdir(SESSION_DIR, { recursive: true });
+      const zip = new AdmZip(session.zipData);
+      zip.extractAllTo(SESSION_DIR, true);
+      console.log("✅ Session restored from Cloud.");
+      return true;
+    }
+    console.log("ℹ️ No previous session found in Cloud.");
+    isFirstLogin = true; // Mark that we need to backup after scan
+    return false;
+  } catch (err) {
+    console.error("❌ Failed to restore session:", err.message);
+    return false;
+  }
+};
+
+// --- WHATSAPP BOT LOGIC ---
+
+let client;
+let isBackingUp = false;
+
+const initializeWhatsApp = async () => {
+  try {
+    if (!isBackingUp) {
+      console.log("Connecting to MongoDB...");
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log("✅ MongoDB Connected!");
+      await restoreSessionFromDb();
+    }
+
+    client = new Client({
+      authStrategy: new LocalAuth({
+        clientId: CLIENT_ID,
+        dataPath: SESSION_DIR
+      }),
+      puppeteer: {
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu'
+        ],
+      }
+    });
+
+    client.on('qr', (qr) => {
+      console.log('--- SCAN THE QR CODE BELOW TO LOG IN ---');
+      qrcode.generate(qr, { small: true });
+      isFirstLogin = true; 
+    });
+
+    client.on('ready', async () => {
+      console.log('✅ WhatsApp AI Bot is Ready!');
+      
+      if (isFirstLogin && !isBackingUp) {
+        console.log("🔄 New Login detected. Finalizing cloud backup in 5s...");
+        isBackingUp = true;
+        isFirstLogin = false;
+        
+        setTimeout(async () => {
+          console.log("💤 Temporarily closing bot to release file locks...");
+          await client.destroy();
+          
+          setTimeout(async () => {
+            await saveSessionToDb();
+            console.log("🚀 Backup complete! Restarting bot for permanent operation...");
+            isBackingUp = false;
+            initializeWhatsApp(); // Restart the bot
+          }, 3000);
+        }, 5000);
+      } else {
+        console.log("⭐ Bot is active and cloud-synced.");
+      }
+    });
+
+    client.on('message', async (msg) => {
+      if (msg.body.includes('*New Inquiry from Portfolio*')) {
+        console.log("🔍 Detected Portfolio Inquiry. Generating AI response...");
+        
+        try {
+          const response = await ollama.chat({
+            model: process.env.OLLAMA_MODEL || "gpt-oss:120b",
+            messages: [
+              { role: 'system', content: THARUN_IDENTITY },
+              { role: 'user', content: msg.body }
+            ]
+          });
+
+          const aiReply = response.message.content;
+          msg.reply(aiReply);
+          console.log("✅ AI Replied successfully!");
+        } catch (error) {
+          console.error("❌ AI Response Error:", error.message);
+          msg.reply("Bro, give me a sec, I'm a bit tied up. I'll get back to you soon! 🤝");
+        }
+      }
+    });
+
+    console.log("🚀 Initializing WhatsApp Client...");
+    client.initialize();
+  } catch (err) {
+    console.error("❌ WhatsApp Initialization Failed:", err.message);
+  }
+};
+
+initializeWhatsApp();
+
+// --- API ENDPOINTS ---
+
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, history } = req.body;
@@ -82,7 +279,7 @@ app.post('/api/chat', async (req, res) => {
       { role: 'user', content: message }
     ];
 
-    console.log(`Connecting to: ${ollama.host}...`);
+    console.log(`Connecting to AI for Web Chat...`);
 
     const response = await ollama.chat({
       model: process.env.OLLAMA_MODEL || "gpt-oss:120b",
@@ -97,7 +294,7 @@ app.post('/api/chat', async (req, res) => {
     res.end();
 
   } catch (error) {
-    console.error("Ollama Error:", error.message);
+    console.error("❌ Ollama Error:", error.message);
     if (!res.headersSent) {
       res.status(500).json({ error: "Failed to connect to AI.", details: error.message });
     } else {
@@ -106,6 +303,6 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('Tharun AI is ready.'));
+app.get('/', (req, res) => res.send('Tharun AI & WhatsApp Bot is Running.'));
 
 app.listen(port, () => console.log(`Server is running on port ${port}.`));

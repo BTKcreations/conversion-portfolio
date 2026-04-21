@@ -1,7 +1,33 @@
 import { motion } from "motion/react";
-import { Send, MessageCircle, Mail, MapPin } from "lucide-react";
+import { Send, MessageCircle, Mail } from "lucide-react";
+import { useState } from "react";
 
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "Website Project",
+    message: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Formatting the message for WhatsApp
+    const message = `*New Inquiry from Portfolio*%0A%0A` +
+      `*Name:* ${formData.name}%0A` +
+      `*Email:* ${formData.email}%0A` +
+      `*Subject:* ${formData.subject}%0A%0A` +
+      `*Message:*%0A${formData.message}`;
+
+    const whatsappUrl = `https://wa.me/919346487255?text=${message}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
     <section id="contact" className="py-32 relative overflow-hidden">
        {/* Bg Accent */}
@@ -55,33 +81,65 @@ export default function Contact() {
             viewport={{ once: true }}
             className="glass p-10 rounded-[40px] border-white/5"
           >
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase px-1">Your Name</label>
-                  <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors" placeholder="John Doe" />
+                  <input 
+                    type="text" 
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors" 
+                    placeholder="John Doe" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase px-1">Email Address</label>
-                  <input type="email" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors" placeholder="john@example.com" />
+                  <input 
+                    type="email" 
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors" 
+                    placeholder="john@example.com" 
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 uppercase px-1">Subject</label>
-                <select className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors appearance-none">
-                  <option className="bg-black">Website Project</option>
-                  <option className="bg-black">UI/UX Design</option>
-                  <option className="bg-black">Optimization Audit</option>
+                <select 
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors appearance-none"
+                >
+                  <option className="bg-black text-white">Website Project</option>
+                  <option className="bg-black text-white">UI/UX Design</option>
+                  <option className="bg-black text-white">Optimization Audit</option>
                 </select>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 uppercase px-1">Your Message</label>
-                <textarea rows={4} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors" placeholder="Tell me about your project..."></textarea>
+                <textarea 
+                  name="message"
+                  required
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows={4} 
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-emerald-500 outline-none transition-colors" 
+                  placeholder="Tell me about your project..."
+                />
               </div>
 
-              <button className="w-full bg-white text-black p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-emerald-500 transition-colors group">
+              <button 
+                type="submit"
+                className="w-full bg-white text-black p-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-emerald-500 transition-colors group"
+              >
                 Send Request <Send size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
