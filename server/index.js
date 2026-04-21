@@ -16,6 +16,9 @@ import path from 'path';
 // Force override because something (dotenvx?) is clashing
 dotenv.config({ override: true });
 
+// Ensure Puppeteer looks for Chrome in our local project folder (for Render persistence)
+process.env.PUPPETEER_CACHE_DIR = path.join(process.cwd(), '.cache/puppeteer');
+
 const app = express();
 const port = process.env.PORT || 5000;
 
