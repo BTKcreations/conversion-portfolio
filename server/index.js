@@ -188,15 +188,30 @@ const initializeWhatsApp = async () => {
     if (!isBackingUp) {
       if (!process.env.MONGODB_URI) {
         console.error("❌ CRITICAL: MONGODB_URI is not defined! Check your Render environment variables.");
-        return; // Don't crash, just stop WhatsApp logic
+        return;
       }
 
       console.log("Connecting to MongoDB...");
       await mongoose.connect(process.env.MONGODB_URI, {
-        serverSelectionTimeoutMS: 10000 // 10s timeout
+        serverSelectionTimeoutMS: 10000 
       });
       console.log("✅ MongoDB Connected!");
       await restoreSessionFromDb();
+    }
+
+    // --- SMART CHROME FINDER ---
+    let chromePath = puppeteer.executablePath();
+    const localChromeDir = path.join(process.cwd(), '.cache/puppeteer');
+    
+    try {
+      const files = await fs.readdir(localChromeDir, { recursive: true });
+      const chromeFile = files.find(f => f.endsWith('/chrome') || f.endsWith('\\chrome'));
+      if (chromeFile) {
+        chromePath = path.join(localChromeDir, chromeFile);
+        console.log(`🎯 Found Chrome at: ${chromePath}`);
+      }
+    } catch (e) {
+      console.log("ℹ️ No local Chrome found, using default path.");
     }
 
     client = new Client({
@@ -206,7 +221,7 @@ const initializeWhatsApp = async () => {
       }),
       puppeteer: {
         headless: true,
-        executablePath: puppeteer.executablePath(),
+        executablePath: chromePath,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
