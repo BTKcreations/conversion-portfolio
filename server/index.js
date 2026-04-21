@@ -97,7 +97,7 @@ let isFirstLogin = false;
 const saveSessionToDb = async () => {
   return new Promise((resolve, reject) => {
     try {
-      console.log("📦 Zipping session for Cloud Backup (Aggressive Cleanup)...");
+      console.log("📦 Zipping session for Cloud Backup (Lean & Fast)...");
       const archive = archiver('zip', { zlib: { level: 9 } });
       const chunks = [];
 
@@ -106,10 +106,10 @@ const saveSessionToDb = async () => {
         try {
           const buffer = Buffer.concat(chunks);
           const sizeMB = (buffer.length / (1024 * 1024)).toFixed(2);
-          console.log(`📊 Zip size: ${sizeMB} MB`);
+          console.log(`📊 Backup size: ${sizeMB} MB`);
 
           if (buffer.length > 15 * 1024 * 1024) {
-             throw new Error("Session zip is still too large (>15MB). Contact support or clean manual.");
+             throw new Error("Session too large for MongoDB (16MB limit). Use GridFS or clean manually.");
           }
 
           await Session.findOneAndUpdate(
@@ -130,7 +130,7 @@ const saveSessionToDb = async () => {
         reject(err);
       });
 
-      // Aggressively exclude large junk folders
+      // Exclude heavy junk folders
       archive.glob('**/*', {
         cwd: SESSION_DIR,
         ignore: [
@@ -182,8 +182,15 @@ let isBackingUp = false;
 const initializeWhatsApp = async () => {
   try {
     if (!isBackingUp) {
+      if (!process.env.MONGODB_URI) {
+        console.error("❌ CRITICAL: MONGODB_URI is not defined! Check your Render environment variables.");
+        return; // Don't crash, just stop WhatsApp logic
+      }
+
       console.log("Connecting to MongoDB...");
-      await mongoose.connect(process.env.MONGODB_URI);
+      await mongoose.connect(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 10000 // 10s timeout
+      });
       console.log("✅ MongoDB Connected!");
       await restoreSessionFromDb();
     }
