@@ -67,13 +67,13 @@ Your Skills/Stack:
 - AI/ML: LLM Orchestration, RAG Architecture, Ollama, Vector DBs (ChromaDB).
 - Security: AES-256 Encryption, JWT, RBAC.
 
-Your Services & Pricing:
-- AI & RAG Integration (₹5,000+): Vector DBs, Smart Chatbots, LLM orchestration.
-- Secure Full-Stack Apps (₹4,000+): Next.js/React + FastAPI/Node.js, Cloud deployment.
-- Cybersecurity (₹3,000+): AES-256 Encryption, Secure Auth systems, API audits.
-- Automation Scripts (₹1,000+): Python/Node.js zero-touch workflows.
-- Web Scraping (₹1,500+): Anti-bot bypass, structured data delivery.
-- Reverse Engineering (₹2,500+): Logic analysis and architecture reconstruction.
+Your Services:
+- AI & RAG Integration: Vector DBs, Smart Chatbots, LLM orchestration.
+- Secure Full-Stack Apps: Next.js/React + FastAPI/Node.js, Cloud deployment.
+- Cybersecurity: AES-256 Encryption, Secure Auth systems, API audits.
+- Automation Scripts: Python/Node.js zero-touch workflows.
+- Web Scraping: Anti-bot bypass, structured data delivery.
+- Reverse Engineering: Logic analysis and architecture reconstruction.
 
 Highlights:
 - "Fact vs Fiction": AI pipeline for fake news detection using RAG & ChromaDB.

@@ -5,7 +5,6 @@ const services = [
   {
     name: "AI & RAG Integration",
     icon: <Brain className="w-6 h-6" />,
-    price: "₹5,000+",
     desc: "Integrating LLMs and RAG architecture into your existing workflows.",
     features: [
       "Vector DB Setup (ChromaDB)",
@@ -19,7 +18,6 @@ const services = [
   {
     name: "Secure Full-Stack Apps",
     icon: <Terminal className="w-6 h-6" />,
-    price: "₹4,000+",
     desc: "End-to-end development of scalable, high-performance web applications.",
     features: [
       "Next.js / React Frontend",
@@ -33,7 +31,6 @@ const services = [
   {
     name: "Cybersecurity & Logic",
     icon: <Shield className="w-6 h-6" />,
-    price: "₹3,000+",
     desc: "Implementing military-grade security and authentication for your data.",
     features: [
       "AES-256 File Encryption",
@@ -47,7 +44,6 @@ const services = [
   {
     name: "Automation Scripts",
     icon: <Cpu className="w-6 h-6" />,
-    price: "₹1,000+",
     desc: "Zero-touch workflows for repetitive digital tasks and data processing.",
     features: [
       "Python / Node.js Automation",
@@ -61,7 +57,6 @@ const services = [
   {
     name: "Web Scraping & Data",
     icon: <Layers className="w-6 h-6" />,
-    price: "₹1,500+",
     desc: "Large-scale data extraction from complex and dynamic websites.",
     features: [
       "Anti-Bot Bypass Solutions",
@@ -75,7 +70,6 @@ const services = [
   {
     name: "Reverse Engineering",
     icon: <SearchCode className="w-6 h-6" />,
-    price: "₹2,500+",
     desc: "Deciphering logic from pre-built systems to understand architecture.",
     features: [
       "System Logic Analysis",
@@ -127,9 +121,6 @@ export default function Services() {
                 </p>
               </div>
 
-              <div className="mb-8">
-                <span className="text-3xl font-black">{service.price}</span>
-              </div>
 
               <ul className="space-y-4 mb-10 flex-grow">
                 {service.features.map(feature => (
