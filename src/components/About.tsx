@@ -12,7 +12,7 @@ const facts = [
   { icon: BookMarked, label: "Research", value: "Published — AI misinformation detection (RAG)" },
   { icon: Briefcase, label: "Focus", value: "LLM apps · Secure backends · Web platforms" },
   { icon: MapPin, label: "Based in", value: "Hyderabad, India · Remote worldwide" },
-  { icon: Languages, label: "Languages", value: "English · Telugu · Hindi" },
+  { icon: Languages, label: "Languages", value: "English · Telugu" },
 ];
 
 export default function About() {

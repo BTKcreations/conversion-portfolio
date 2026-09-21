@@ -12,7 +12,7 @@ const AiChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', content: 'Hi! 👋 I\'m **AI Tharun** — ask me anything about my work, skills, or how I can help your project!' }
+    { role: 'bot', content: 'Hey! 👋 I\'m **Tharun** — I reply in **English or Telugu** only. Ask me about my work, projects, services, or pricing!' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

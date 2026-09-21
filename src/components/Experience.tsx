@@ -4,7 +4,7 @@ import { Briefcase, Calendar, Check } from "lucide-react";
 const experiences = [
   {
     company: "HackersDaddy Cyber Security Solutions Ltd",
-    role: "Intern Developer",
+    role: "Software Developer Intern",
     date: "Oct 2024 – Oct 2025",
     points: [
       "Executed development tasks for cybersecurity-centric projects, focusing on system integrity and backend scalability.",
