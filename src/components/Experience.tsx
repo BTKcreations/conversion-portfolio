@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Briefcase, Calendar } from "lucide-react";
+import { Briefcase, Calendar, Check } from "lucide-react";
 
 const experiences = [
   {
@@ -9,69 +9,73 @@ const experiences = [
     points: [
       "Executed development tasks for cybersecurity-centric projects, focusing on system integrity and backend scalability.",
       "Collaborated on backend feature implementation and rigorous debugging to ensure high uptime.",
-      "Applied advanced secure coding standards and contributed to end-to-end deployment activities."
-    ]
+      "Applied advanced secure coding standards and contributed to end-to-end deployment activities.",
+    ],
   },
   {
     company: "Academor",
     role: "Artificial Intelligence Intern",
-    date: "July 2023 – Aug 2023",
+    date: "Jul 2023 – Aug 2023",
     points: [
       "Designed and implemented foundational machine learning models for data classification problems.",
       "Evaluated model performance through optimization techniques and rigorous data preprocessing.",
-      "Gained expertise in AI workflows: collection, cleaning, and feature engineering."
-    ]
-  }
+      "Gained expertise in AI workflows: collection, cleaning, and feature engineering.",
+    ],
+  },
 ];
 
 export default function Experience() {
   return (
-    <section id="experience" className="py-32">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
-          <div>
-            <span className="text-emerald-500 font-mono text-sm uppercase tracking-widest mb-4 block">Professional Journey</span>
-            <h2 className="text-5xl font-heading font-bold">Experience<span className="text-emerald-500">.</span></h2>
-          </div>
+    <section id="experience" className="py-24 lg:py-32">
+      <div className="container-site">
+        <div className="mb-14">
+          <span className="eyebrow">Professional journey</span>
+          <h2 className="text-4xl md:text-5xl font-bold">Experience<span className="text-emerald-600">.</span></h2>
         </div>
 
-        <div className="space-y-12">
-          {experiences.map((exp, i) => (
-            <motion.div
-              key={exp.company}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="glass p-8 md:p-12 rounded-[32px] border-white/5 relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-emerald-500/10 transition-colors">
-                <Briefcase size={120} />
-              </div>
-              
-              <div className="relative z-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{exp.role}</h3>
-                    <p className="text-emerald-500 font-bold">{exp.company}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-500 text-sm font-bold bg-white/5 px-4 py-2 rounded-full w-fit">
-                    <Calendar size={16} />
-                    {exp.date}
-                  </div>
-                </div>
+        <div className="relative max-w-3xl">
+          {/* Vertical line */}
+          <div className="absolute left-[22px] top-2 bottom-2 w-px bg-neutral-200" />
 
-                <ul className="space-y-4">
-                  {exp.points.map((point, idx) => (
-                    <li key={idx} className="flex gap-4 text-gray-400 leading-relaxed">
-                      <span className="text-emerald-500 mt-1.5">•</span>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          ))}
+          <div className="space-y-10">
+            {experiences.map((exp, i) => (
+              <motion.div
+                key={exp.company}
+                initial={{ opacity: 0, x: -24 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ delay: i * 0.12, duration: 0.55 }}
+                className="relative pl-16"
+              >
+                {/* Node */}
+                <span className="absolute left-0 top-1.5 w-11 h-11 rounded-full bg-white border border-neutral-200 shadow-sm grid place-items-center text-emerald-700">
+                  <Briefcase size={18} />
+                </span>
+
+                <div className="card p-7 lg:p-8">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+                    <div>
+                      <h3 className="text-xl font-bold">{exp.role}</h3>
+                      <p className="text-emerald-700 font-semibold text-sm mt-0.5">{exp.company}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200 px-3.5 py-1.5 rounded-full w-fit">
+                      <Calendar size={13} />
+                      {exp.date}
+                    </span>
+                  </div>
+
+                  <ul className="space-y-3">
+                    {exp.points.map((point, idx) => (
+                      <li key={idx} className="flex gap-3 text-neutral-600 text-[15px] leading-relaxed">
+                        <Check size={16} className="text-emerald-600 mt-1 shrink-0" />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -12,7 +12,7 @@ const AiChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', content: 'Hey bro! I am Tharun (well, AI Tharun). Ask me anything about my work or tech! 🚀' }
+    { role: 'bot', content: 'Hi! 👋 I\'m **AI Tharun** — ask me anything about my work, skills, or how I can help your project!' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -48,7 +48,7 @@ const AiChat: React.FC = () => {
         })
       });
 
-      if (!response.ok) throw new Error('Failed to connect to backend, bro.');
+      if (!response.ok) throw new Error('Failed to connect to backend.');
 
       // Prepare for streaming
       const reader = response.body?.getReader();
@@ -58,6 +58,7 @@ const AiChat: React.FC = () => {
       
       if (reader) {
         let accumulatedResponse = '';
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -74,7 +75,7 @@ const AiChat: React.FC = () => {
       }
     } catch (error) {
       console.error(error);
-      setMessages(prev => [...prev, { role: 'bot', content: 'Hmm, something went wrong. Maybe my backend took a break? Check the console, bro.' }]);
+      setMessages(prev => [...prev, { role: 'bot', content: 'Hmm, something went wrong on my end. Please try again in a moment — or reach me directly via the contact form.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -88,42 +89,46 @@ const AiChat: React.FC = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="glass mb-4 w-[calc(100vw-2rem)] sm:w-[400px] h-[70vh] sm:h-[500px] rounded-3xl flex flex-col overflow-hidden shadow-2xl relative"
+            className="mb-4 w-[calc(100vw-2rem)] sm:w-[400px] h-[70vh] sm:h-[520px] rounded-3xl flex flex-col overflow-hidden shadow-2xl shadow-neutral-950/20 bg-white border border-neutral-200"
           >
             {/* Header */}
-            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-emerald-500/20 to-blue-500/20">
+            <div className="p-4 border-b border-neutral-100 flex justify-between items-center bg-neutral-50/80">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-emerald-500/50">
+                <div className="w-9 h-9 rounded-full bg-neutral-950 flex items-center justify-center text-white text-xs font-bold">
                   T
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-sm">Ask Tharun AI</h3>
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-[10px] text-gray-400 uppercase tracking-widest">Online</span>
+                  <h3 className="font-heading font-semibold text-sm text-neutral-900">Ask Tharun AI</h3>
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-600" />
+                    </span>
+                    <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-semibold">Online</span>
                   </div>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-white/10 rounded-lg transition-colors text-gray-400"
+                aria-label="Close chat"
+                className="p-2 hover:bg-neutral-200/70 rounded-lg transition-colors text-neutral-500"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`flex gap-2 max-w-[85%] ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                    <div className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${m.role === 'user' ? 'bg-blue-500' : 'bg-emerald-500'}`}>
+                    <div className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${m.role === 'user' ? 'bg-neutral-950 text-white' : 'bg-emerald-600 text-white'}`}>
                       {m.role === 'user' ? <User size={12} /> : <Bot size={12} />}
                     </div>
                     <div className={`p-3 rounded-2xl text-sm leading-relaxed prose-chat ${
                       m.role === 'user' 
-                        ? 'bg-blue-600 text-white rounded-tr-none shadow-lg shadow-blue-900/20' 
-                        : 'bg-white/10 text-gray-200 rounded-tl-none border border-white/5 shadow-lg shadow-black/20'
+                        ? 'bg-neutral-950 text-white rounded-tr-none' 
+                        : 'bg-neutral-100 text-neutral-800 rounded-tl-none border border-neutral-200/70'
                     }`}>
                       {m.content ? (
                         <div className="break-words">
@@ -132,7 +137,7 @@ const AiChat: React.FC = () => {
                           </ReactMarkdown>
                         </div>
                       ) : (
-                        isLoading && i === messages.length - 1 ? <Loader2 size={14} className="animate-spin" /> : ''
+                        isLoading && i === messages.length - 1 ? <Loader2 size={14} className="animate-spin text-emerald-600" /> : ''
                       )}
                     </div>
                   </div>
@@ -142,25 +147,25 @@ const AiChat: React.FC = () => {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSubmit} className="p-4 border-t border-white/10 bg-black/40">
+            <form onSubmit={handleSubmit} className="p-4 border-t border-neutral-100 bg-neutral-50/80">
               <div className="relative">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type kardo bro..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-emerald-500/50 transition-colors text-white"
+                  placeholder="Ask about my work, skills, pricing..."
+                  className="w-full bg-white border border-neutral-200 rounded-xl py-3 pl-4 pr-12 text-sm focus:outline-none focus:border-emerald-600 transition-colors text-neutral-900 placeholder:text-neutral-400"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-all shadow-lg shadow-emerald-500/20"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-neutral-950 hover:bg-emerald-600 disabled:bg-neutral-300 disabled:opacity-50 text-white rounded-lg transition-all"
                 >
-                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {isLoading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                 </button>
               </div>
-              <p className="text-[10px] text-center text-gray-500 mt-2">
-                Powered by Tharun's Brain (via gemma4:31b)
+              <p className="text-[10px] text-center text-neutral-400 mt-2">
+                AI assistant · responses may take a few seconds
               </p>
             </form>
           </motion.div>
@@ -172,12 +177,16 @@ const AiChat: React.FC = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center text-white shadow-2xl shadow-emerald-500/40 border border-white/20 relative"
+        aria-label="Open AI chat"
+        className="w-14 h-14 rounded-full bg-neutral-950 hover:bg-emerald-600 flex items-center justify-center text-white shadow-2xl shadow-neutral-950/30 transition-colors relative"
       >
-        <MessageSquare size={24} />
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-black flex items-center justify-center">
-            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
-        </div>
+        {isOpen ? <X size={22} /> : <MessageSquare size={22} />}
+        {!isOpen && (
+          <span className="absolute -top-1 -right-1 flex h-4 w-4">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white" />
+          </span>
+        )}
       </motion.button>
     </div>
   );

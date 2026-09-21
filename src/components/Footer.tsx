@@ -1,59 +1,75 @@
-import { motion } from "motion/react";
-import { Github, Twitter, Linkedin, Instagram, Mail } from "lucide-react";
+import { Github, Twitter, Linkedin, Instagram, Mail, ArrowUp } from "lucide-react";
+
+const socials = [
+  { Icon: Github, href: "https://github.com/BTKcreations", label: "GitHub" },
+  { Icon: Linkedin, href: "https://www.linkedin.com/in/budde-tharunkumar-362296261/", label: "LinkedIn" },
+  { Icon: Twitter, href: "https://x.com/", label: "X / Twitter" },
+  { Icon: Instagram, href: "https://instagram.com/", label: "Instagram" },
+  { Icon: Mail, href: "mailto:buddetharunkumar123@gmail.com", label: "Email" },
+];
 
 export default function Footer() {
   return (
-    <footer className="py-20 border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-          <div>
-            <div className="text-2xl font-display tracking-wider mb-4">
-              THARUN<span className="text-emerald-500">.</span>
-            </div>
-            <p className="max-w-xs text-gray-500 text-sm">
-              Specializing in Artificial Intelligence and Machine Learning solutions.
+    <footer className="bg-neutral-950 text-neutral-400 pt-16 pb-8">
+      <div className="container-site">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-10 pb-12 border-b border-white/10">
+          <div className="text-center md:text-left">
+            <a href="#top" className="inline-flex items-center gap-2.5 mb-4">
+              <span className="w-8 h-8 rounded-lg bg-white text-neutral-950 grid place-items-center font-heading font-bold text-sm">
+                TK
+              </span>
+              <span className="font-heading font-semibold tracking-tight text-lg text-white">
+                Tharun Kumar
+              </span>
+            </a>
+            <p className="max-w-xs text-sm leading-relaxed">
+              Full-Stack &amp; AI Engineer building intelligent, production-grade
+              software for teams worldwide.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            {["About", "Projects", "Services", "Contact"].map((item) => (
-              <a 
-                key={item} 
-                href={`#${item.toLowerCase()}`}
-                className="text-sm font-bold text-gray-400 hover:text-white transition-colors"
+          <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            {["About", "Skills", "Work", "Services", "Pricing", "FAQ", "Contact"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase() === "work" ? "projects" : item.toLowerCase()}`}
+                className="text-sm font-medium hover:text-white transition-colors"
               >
                 {item}
               </a>
             ))}
-          </div>
+          </nav>
 
-          <div className="flex items-center gap-4">
-            {[
-              { Icon: Github, href: "https://github.com/BTKcreations" },
-              { Icon: Linkedin, href: "https://www.linkedin.com/in/budde-tharunkumar-362296261/" },
-              { Icon: Mail, href: "mailto:buddetharunkumar123@gmail.com" },
-            ].map(({ Icon, href }, i) => (
-              <motion.a
-                key={i}
+          <div className="flex items-center gap-3">
+            {socials.map(({ Icon, href, label }) => (
+              <a
+                key={label}
                 href={href}
                 target="_blank"
                 rel="noreferrer"
-                whileHover={{ scale: 1.1, y: -2 }}
-                className="w-10 h-10 glass flex items-center justify-center rounded-xl text-gray-400 hover:text-emerald-500 transition-colors"
+                aria-label={label}
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 grid place-items-center hover:bg-emerald-500 hover:text-neutral-950 hover:border-emerald-500 transition-all"
               >
-                <Icon size={18} />
-              </motion.a>
+                <Icon size={17} />
+              </a>
             ))}
           </div>
         </div>
 
-        <div className="mt-20 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[10px] text-gray-600 uppercase tracking-widest font-bold">
-            &copy; 2026 Conversion Portfolio. All rights reserved.
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-neutral-500">
+            © 2026 Tharun Kumar — bstk.in. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-[10px] text-gray-600 uppercase tracking-widest font-bold hover:text-white">Privacy Policy</a>
-            <a href="#" className="text-[10px] text-gray-600 uppercase tracking-widest font-bold hover:text-white">Terms of Service</a>
+            <span className="text-xs text-neutral-600">
+              Designed &amp; built with ♥ in Hyderabad
+            </span>
+            <a
+              href="#top"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
+            >
+              Back to top <ArrowUp size={14} />
+            </a>
           </div>
         </div>
       </div>
