@@ -36,8 +36,8 @@ const AiChat: React.FC = () => {
 
     try {
       const apiUrl = import.meta.env.DEV 
-        ? 'http://localhost:5000/api/chat' 
-        : 'https://conversion-portfolio.onrender.com/api/chat';
+        ? 'http://localhost:4000/api/chat' 
+        : 'https://api.bstk.in/api/chat';
 
       const response = await fetch(apiUrl, {
         method: 'POST',
