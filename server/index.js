@@ -266,6 +266,13 @@ const initializeWhatsApp = async () => {
       await restoreSessionFromDb();
     }
 
+    // Clear stale Chrome Singleton locks (container hostname changes on recreate).
+    // Without this, Chrome refuses to launch after a rebuild: "profile appears to be in use by another process"
+    const profileDir = path.join(SESSION_DIR, `session-${CLIENT_ID}`);
+    for (const lockFile of ['SingletonLock', 'SingletonSocket', 'SingletonCookie']) {
+      try { await fs.rm(path.join(profileDir, lockFile), { force: true }); } catch (e) {}
+    }
+
     // --- SMART CHROME FINDER ---
     let chromePath = puppeteer.executablePath();
     const localChromeDir = path.join(process.cwd(), '.cache/puppeteer');
