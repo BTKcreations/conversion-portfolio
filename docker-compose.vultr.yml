@@ -1,0 +1,44 @@
+# BSTK AI Bot deployment on Vultr (Dokploy/Traefik host)
+# Usage: docker compose -f docker-compose.vultr.yml up -d --build
+services:
+  bot:
+    build: ./server
+    container_name: bstk-ai-bot
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      - PORT=4000
+      - MONGODB_URI=mongodb://mongo:27017/tharunbot
+    volumes:
+      - bot-cache:/app/.cache
+      - bot-auth:/app/.wwebjs_auth
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.bstk-api.rule=Host(`api.bstk.in`)
+      - traefik.http.routers.bstk-api.entrypoints=websecure
+      - traefik.http.routers.bstk-api.tls.certresolver=letsencrypt
+      - traefik.http.services.bstk-api.loadbalancer.server.port=4000
+    networks:
+      - dokploy-network
+      - internal
+
+  mongo:
+    image: mongo:7
+    container_name: bstk-ai-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - internal
+
+volumes:
+  bot-cache:
+  bot-auth:
+  mongo-data:
+
+networks:
+  dokploy-network:
+    external: true
+  internal:
