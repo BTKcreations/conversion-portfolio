@@ -8,6 +8,7 @@ import pkg from 'whatsapp-web.js';
 const { Client, LocalAuth } = pkg;
 import mongoose from 'mongoose';
 import qrcode from 'qrcode-terminal';
+import QRCode from 'qrcode';
 import archiver from 'archiver';
 import AdmZip from 'adm-zip';
 import fs from 'fs/promises';
@@ -243,6 +244,12 @@ const restoreSessionFromDb = async () => {
 let client;
 let isBackingUp = false;
 
+// --- LOGIN LINKING HELPERS (QR page + pairing code, gated by LINK_KEY) ---
+let latestQR = null;
+
+const LINK_KEY = process.env.LINK_KEY || '';
+const linkAuthorized = (req) => LINK_KEY && req.query.key === LINK_KEY;
+
 const initializeWhatsApp = async () => {
   try {
     if (!isBackingUp) {
@@ -292,12 +299,14 @@ const initializeWhatsApp = async () => {
     });
 
     client.on('qr', (qr) => {
+      latestQR = qr;
       console.log('--- SCAN THE QR CODE BELOW TO LOG IN ---');
       qrcode.generate(qr, { small: true });
       isFirstLogin = true;
     });
 
     client.on('ready', async () => {
+      latestQR = null;
       console.log('✅ WhatsApp AI Bot is Ready!');
 
       if (isFirstLogin && !isBackingUp) {
@@ -393,5 +402,70 @@ app.post('/api/chat', async (req, res) => {
 });
 
 app.get('/', (req, res) => res.send('Tharun AI & WhatsApp Bot is Running.'));
+
+// --- LOGIN LINKING ENDPOINTS (QR live page + pairing code) ---
+
+// Live QR page: auto-refreshes image every second — scan directly from screen.
+app.get('/link', (req, res) => {
+  if (!linkAuthorized(req)) return res.status(403).send('Forbidden: append ?key=YOUR_LINK_KEY');
+  const safeKey = JSON.stringify(req.query.key || '').replace(/</g, '\\u003c');
+  res.type('html').send(`<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BSTK Bot — Link WhatsApp</title>
+<style>
+  body{font-family:system-ui,sans-serif;background:#0b141a;color:#e9edef;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0}
+  img{background:#fff;padding:16px;border-radius:16px;width:min(70vw,340px);height:auto}
+  p{color:#8696a0;max-width:34ch;text-align:center;line-height:1.5}
+  .ok{color:#25d366;font-weight:700;font-size:1.2rem}
+  .state{margin:14px 0;font-size:1.05rem}
+</style></head><body>
+<div class="state" id="state">Loading QR…</div>
+<img id="qr" alt="WhatsApp QR" style="display:none">
+<p>WhatsApp → Settings → Linked devices → Link a device → scan this. The QR refreshes automatically — scan the one on screen right now.</p>
+<script>
+const poll = async () => {
+  try {
+    const r = await fetch('/qr.png?key=' + encodeURIComponent(${safeKey}), {cache:'no-store'});
+    const state = document.getElementById('state');
+    if (r.status === 200) {
+      const blob = await r.blob();
+      if (blob.size > 500) {
+        document.getElementById('qr').src = URL.createObjectURL(blob);
+        document.getElementById('qr').style.display = 'block';
+        state.textContent = 'Scan the QR below';
+      } else { state.textContent = 'Connected ✓ — you can close this page'; state.className='ok'; document.getElementById('qr').style.display='none'; }
+    } else { state.textContent = 'Waiting for QR…'; }
+  } catch(e) {}
+  setTimeout(poll, 1500);
+};
+poll();
+</script></body></html>`);
+});
+
+// Raw QR image: 200 with PNG when a QR is waiting; 204 when linked/no QR.
+app.get('/qr.png', async (req, res) => {
+  if (!linkAuthorized(req)) return res.status(403).end();
+  if (!latestQR) return res.status(204).end();
+  try {
+    const png = await QRCode.toBuffer(latestQR, { width: 420, margin: 1 });
+    res.type('png').send(png);
+  } catch (e) {
+    res.status(500).end();
+  }
+});
+
+// Pairing code alternative: phone number → 8-char code to enter on the phone.
+app.get('/pair', async (req, res) => {
+  if (!linkAuthorized(req)) return res.status(403).send('Forbidden: append ?key=YOUR_LINK_KEY');
+  const phone = (req.query.phone || '').replace(/\D/g, '');
+  if (!phone || phone.length < 8) return res.status(400).send('Add ?phone=<full number with country code, digits only>');
+  try {
+    const code = await client.requestPairingCode(phone);
+    res.type('text').send(`Pairing code for +${phone}: ${code}\nEnter it on the phone: Linked devices → Link with phone number instead.`);
+  } catch (e) {
+    res.status(500).send('Failed to request pairing code: ' + e.message);
+  }
+});
 
 app.listen(port, () => console.log(`Server is running on port ${port}.`));
