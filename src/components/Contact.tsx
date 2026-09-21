@@ -2,6 +2,23 @@ import { motion } from "motion/react";
 import { Send, MessageCircle, Mail, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 
+const WHATSAPP_NUMBER = "919346487255";
+
+/** Opens WhatsApp chat with a pre-filled message. */
+const openWhatsApp = (text: string) => {
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, "_blank");
+};
+
+/** Opens Gmail's web compose window with To/Subject/Body prefilled. */
+const openGmailCompose = (subject: string, body: string) => {
+  const url =
+    `https://mail.google.com/mail/?view=cm&fs=1` +
+    `&to=${encodeURIComponent("buddetharunkumar123@gmail.com")}` +
+    `&su=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body)}`;
+  window.open(url, "_blank");
+};
+
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
@@ -11,18 +28,21 @@ export default function Contact() {
   });
   const [sent, setSent] = useState(false);
 
+  /** Structured inquiry — the Render AI bot auto-detects this format and replies instantly. */
+  const buildInquiryMessage = () =>
+    `*New Inquiry from bstk.in*\n` +
+    `--------------------------\n` +
+    `*Name:* ${formData.name}\n` +
+    `*Email:* ${formData.email}\n` +
+    `*Service Needed:* ${formData.subject}\n` +
+    `--------------------------\n` +
+    `*Project Details:*\n${formData.message}\n` +
+    `--------------------------\n` +
+    `(Auto-generated from bstk.in contact form — AI, please acknowledge and reply with next steps.)`;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const message =
-      `*New Inquiry from bstk.in*%0A%0A` +
-      `*Name:* ${formData.name}%0A` +
-      `*Email:* ${formData.email}%0A` +
-      `*Subject:* ${formData.subject}%0A%0A` +
-      `*Message:*%0A${formData.message}`;
-
-    const whatsappUrl = `https://wa.me/919346487255?text=${message}`;
-    window.open(whatsappUrl, "_blank");
+    openWhatsApp(buildInquiryMessage());
     setSent(true);
     setTimeout(() => setSent(false), 5000);
   };
@@ -52,24 +72,33 @@ export default function Contact() {
             </p>
 
             <div className="space-y-5">
-              <a
-                href="mailto:buddetharunkumar123@gmail.com"
-                className="flex items-center gap-4 p-4 rounded-2xl border border-neutral-200 bg-white hover:border-emerald-600/40 hover:shadow-md transition-all group"
+              <button
+                type="button"
+                onClick={() =>
+                  openGmailCompose(
+                    "Project Inquiry from bstk.in",
+                    "Hi Tharun,\n\nI found your portfolio and I'd like to discuss a project.\n\nService needed: \nBudget range: \nTimeline: \n\nProject details:\n"
+                  )
+                }
+                className="flex items-center gap-4 p-4 rounded-2xl border border-neutral-200 bg-white hover:border-emerald-600/40 hover:shadow-md transition-all group text-left w-full"
               >
                 <span className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 grid place-items-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                   <Mail size={20} />
                 </span>
                 <div>
-                  <span className="text-xs text-neutral-400 uppercase font-bold tracking-wide">Email me</span>
+                  <span className="text-xs text-neutral-400 uppercase font-bold tracking-wide">Email me — opens Gmail compose</span>
                   <p className="text-[15px] font-semibold text-neutral-900">buddetharunkumar123@gmail.com</p>
                 </div>
-              </a>
+              </button>
 
-              <a
-                href="https://wa.me/919346487255"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 rounded-2xl border border-neutral-200 bg-white hover:border-emerald-600/40 hover:shadow-md transition-all group"
+              <button
+                type="button"
+                onClick={() =>
+                  openWhatsApp(
+                    "Hi Tharun! I visited bstk.in and I'd like to discuss a project. Can we talk?"
+                  )
+                }
+                className="flex items-center gap-4 p-4 rounded-2xl border border-neutral-200 bg-white hover:border-emerald-600/40 hover:shadow-md transition-all group text-left w-full"
               >
                 <span className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 grid place-items-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                   <MessageCircle size={20} />
@@ -78,7 +107,7 @@ export default function Contact() {
                   <span className="text-xs text-neutral-400 uppercase font-bold tracking-wide">WhatsApp — fastest response</span>
                   <p className="text-[15px] font-semibold text-neutral-900">+91 93464 87255</p>
                 </div>
-              </a>
+              </button>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-neutral-50 border border-neutral-200">
