@@ -330,8 +330,13 @@ const initializeWhatsApp = async () => {
       }
     });
 
-    client.on('message', async (msg) => {
-      // Structured inquiry from the bstk.in contact form (WhatsApp deep-link with prefilled text)
+    client.on('message_create', async (msg) => {
+      if (msg.from === 'status@broadcast' || !msg.body) return;
+      // Debug: log every message so triggering is observable in logs
+      console.log(`📩 message | fromMe=${msg.fromMe} | chat=${msg.from} | "${msg.body.slice(0, 60).replace(/\n/g, ' ')}"`);
+
+      // Structured inquiry from the bstk.in contact form (WhatsApp deep-link with prefilled text).
+      // message_create (not 'message') so self-sent tests (Message Yourself) also trigger.
       const isInquiry = /\*?\s*New Inquiry from (bstk\.in|Portfolio)\s*\*?/i.test(msg.body);
       if (isInquiry) {
         console.log("🔍 Detected bstk.in Portfolio Inquiry. Generating AI acknowledgment...");
