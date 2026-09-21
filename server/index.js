@@ -23,6 +23,9 @@ process.env.PUPPETEER_CACHE_DIR = path.join(process.cwd(), '.cache/puppeteer');
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Behind Traefik/reverse proxy on Vultr (needed for correct rate-limit client IPs)
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(cors({
   origin: [
